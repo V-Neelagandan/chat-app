@@ -2,9 +2,8 @@ services:
   # -------------- BACKEND --------------
   - type: web
     name: whatsapp-backend
-    runtime: python          # <— important
+    runtime: python
     rootDir: backend
-    plan: free               # optional, but nice
     buildCommand: "pip install -r requirements.txt"
     startCommand: "daphne -b 0.0.0.0 -p 8000 core.asgi:application"
     envVars:
@@ -15,7 +14,6 @@ services:
       - key: DEBUG
         value: "False"
 
-      # ---- DB (temporary, we’ll swap to cloud MySQL later) ----
       - key: DB_NAME
         value: whatsapp_db
       - key: DB_USER
@@ -27,16 +25,14 @@ services:
       - key: DB_PORT
         value: "3306"
 
-      # Allow React app URL (update AFTER frontend first deploy)
       - key: FRONTEND_ORIGIN
         value: "https://placeholder-frontend-url.com"
 
   # -------------- FRONTEND --------------
   - type: web
     name: whatsapp-frontend
-    runtime: static          # <— this makes it a static site
+    runtime: static
     rootDir: frontend
-    plan: free               # optional
     buildCommand: "npm install && npm run build"
     staticPublishPath: "dist"
     envVars:

@@ -2,8 +2,9 @@ services:
   # -------------- BACKEND --------------
   - type: web
     name: whatsapp-backend
-    env: python
+    runtime: python          # <— important
     rootDir: backend
+    plan: free               # optional, but nice
     buildCommand: "pip install -r requirements.txt"
     startCommand: "daphne -b 0.0.0.0 -p 8000 core.asgi:application"
     envVars:
@@ -14,7 +15,7 @@ services:
       - key: DEBUG
         value: "False"
 
-      # ---- DB (temporary / or real later) ----
+      # ---- DB (temporary, we’ll swap to cloud MySQL later) ----
       - key: DB_NAME
         value: whatsapp_db
       - key: DB_USER
@@ -31,9 +32,11 @@ services:
         value: "https://placeholder-frontend-url.com"
 
   # -------------- FRONTEND --------------
-  - type: static_site        # ⬅️ THIS is the important fix
+  - type: web
     name: whatsapp-frontend
+    runtime: static          # <— this makes it a static site
     rootDir: frontend
+    plan: free               # optional
     buildCommand: "npm install && npm run build"
     staticPublishPath: "dist"
     envVars:

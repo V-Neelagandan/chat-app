@@ -23,6 +23,7 @@ diff-match-patch==20241021
 distlib==0.3.9
 dj-database-url==3.0.1
 Django==5.1.6
+django-cors-headers==4.9.0
 django-grappelli==4.0.2
 django-import-export==4.3.7
 django-jazzmin==3.0.1

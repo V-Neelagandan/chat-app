@@ -55,7 +55,7 @@ INSTALLED_APPS = [
 
 
 CORS_ALLOWED_ORIGINS = [
-    "https://chat-app-frontend-owqf.onrender.com",,
+    "https://chat-app-frontend-owqf.onrender.com",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]

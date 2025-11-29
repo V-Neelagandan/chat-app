@@ -34,7 +34,8 @@ SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
+# ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
+ALLOWED_HOSTS =["*"]
 
 # Application definition
 
@@ -53,13 +54,14 @@ INSTALLED_APPS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://chat-app-z1ko.onrender.com",
+    "https://chat-app-z1ko.onrender.com",  #backend URL
+    "https://chat-app-frontend-owqf.onrender.com" #frontend URL
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    os.getenv("FRONTEND_ORIGIN", "https://example.com"),
+    "https://chat-app-frontend-owqf.onrender.com",,
 ]
 
 

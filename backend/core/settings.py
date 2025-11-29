@@ -53,25 +53,31 @@ INSTALLED_APPS = [
     'corsheaders',
 ]
 
+
+CORS_ALLOWED_ORIGINS = [
+    "https://chat-app-frontend-owqf.onrender.com",,
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
 CSRF_TRUSTED_ORIGINS = [
     "https://chat-app-z1ko.onrender.com",  #backend URL
     "https://chat-app-frontend-owqf.onrender.com" #frontend URL
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "https://chat-app-frontend-owqf.onrender.com",,
-]
-
-
 CORS_ALLOW_CREDENTIALS = True
+
+# Cross-site cookie settings (important because frontend & backend are different domains)
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = "None"
+CSRF_COOKIE_SAMESITE = "None"
+
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",  
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
-
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

@@ -1,0 +1,67 @@
+/* Full page center */
+.page-center {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #111; /* dark background */
+}
+
+/* Login box */
+.card {
+  background: #1e1e1e;
+  padding: 35px;
+  width: 350px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.4);
+  text-align: center;
+}
+
+.card h2 {
+  color: #070707;
+  margin-bottom: 20px;
+  font-size: 26px;
+  font-weight: 600;
+}
+
+/* Input fields */
+.card input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: #2b2b2b;
+  color: white;
+  font-size: 15px;
+  outline: none;
+}
+
+.card input:focus {
+  outline: 2px solid #00a884; /* WhatsApp green */
+}
+
+/* Login button */
+.send-btn {
+  width: 100%;
+  padding: 12px;
+  background: #00a884; /* WhatsApp green */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: 0.2s;
+}
+
+.send-btn:hover {
+  background: #019e7b;
+}
+
+/* Error message */
+.error {
+  color: #ff4d4d;
+  font-size: 14px;
+  margin-top: -5px;
+  margin-bottom: 10px;
+}

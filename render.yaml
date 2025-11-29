@@ -1,0 +1,41 @@
+services:
+  # ---------------- BACKEND ----------------
+  - type: web
+    name: whatsapp-backend
+    env: python
+    rootDir: backend
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "daphne -b 0.0.0.0 -p 8000 core.asgi:application"
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: core.settings
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      # ---- DB (fill these in Render dashboard or here) ----
+      - key: DB_NAME
+        value: whatsapp_db
+      - key: DB_USER
+        value: root
+      - key: DB_PASSWORD
+        value: root
+      - key: DB_HOST
+        value: 127.0.0.1
+      - key: DB_PORT
+        value: "3306"
+      # Allow React app URL (update after first deploy frontend)
+      - key: FRONTEND_ORIGIN
+        value: "https://your-frontend.onrender.com"
+
+  # ---------------- FRONTEND ----------------
+  - type: static
+    name: whatsapp-frontend
+    rootDir: frontend
+    buildCommand: "npm install && npm run build"
+    staticPublishPath: "dist"
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: "https://whatsapp-backend.onrender.com"
+      - key: VITE_WS_BASE_URL
+        value: "wss://whatsapp-backend.onrender.com"

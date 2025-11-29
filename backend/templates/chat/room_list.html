@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat Rooms</title>
+  
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #e9eef5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+      width: 400px;
+    }
+    h2 {
+      text-align: center;
+      margin-top: 0;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0 20px 0;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+    a.room-link {
+      display: block;
+      padding: 8px 10px;
+      border-radius: 6px;
+      background: #f1f3f7;
+      text-decoration: none;
+      color: #333;
+    }
+    a.room-link:hover {
+      background: #dfe4f0;
+    }
+    form {
+      display: flex;
+      margin-top: 10px;
+    }
+    input[name="room_name"] {
+      flex: 1;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #bbb;
+      outline: none;
+    }
+    button {
+      margin-left: 8px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      background: #4caf50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #43a047;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      margin-bottom: 10px;
+      color: #555;
+    }
+
+    .room-title {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.room-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: #555;
+}
+
+.last-msg.empty {
+  font-style: italic;
+  color: #888;
+}
+
+.badge {
+  background: #4caf50;
+  color: #fff;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 12px;
+  min-width: 22px;
+  text-align: center;
+}
+
+  </style>
+
+</head>
+<body>
+  <div class="container">
+    <div class="top-bar">
+      <span>Welcome, {{ request.user.username }}</span>
+      <a href="{% url 'logout' %}">Logout</a>
+    </div>
+
+    <h2>Chat Rooms</h2>
+
+    <ul>
+  {% for item in room_data %}
+    <li>
+      <a class="room-link" href="{% url 'chat_room' item.room.room_name %}">
+        <div class="room-title">{{ item.room.room_name }}</div>
+
+        <div class="room-meta">
+          {% if item.last_message %}
+            <span class="last-msg">
+              {{ item.last_message.sender }}:
+              {{ item.last_message.message|truncatechars:30 }}
+            </span>
+          {% else %}
+            <span class="last-msg empty">No messages yet</span>
+          {% endif %}
+
+          {% if item.unread %}
+            <span class="badge">{{ item.unread }}</span>
+          {% endif %}
+        </div>
+      </a>
+    </li>
+  {% empty %}
+    <li>No rooms yet.</li>
+  {% endfor %}
+</ul>
+
+
+    <form method="post">
+      {% csrf_token %}
+      <input type="text" name="room_name" placeholder="New room name..." required>
+      <button type="submit">Create</button>
+    </form>
+  </div>
+</body>
+</html>

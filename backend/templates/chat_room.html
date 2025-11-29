@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chat Room - {{ room_name }}</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #e9eef5;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .chat-container {
+        width: 400px;
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+      }
+      h2 {
+        margin-top: 0;
+        text-align: center;
+      }
+      #messages {
+        height: 300px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 10px;
+        background: #f7f7fb;
+        margin-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+      }
+      .msg-left {
+        background: #ffffff;
+        color: #000;
+        padding: 8px 10px;
+        border-radius: 6px;
+        margin: 5px 0;
+        max-width: 80%;
+        word-wrap: break-word;
+        align-self: flex-start;
+        border: 1px solid #ddd;
+      }
+
+      .msg-right {
+        background: #4caf50;
+        color: white;
+        padding: 8px 10px;
+        border-radius: 6px;
+        margin: 5px 0;
+        max-width: 80%;
+        word-wrap: break-word;
+        align-self: flex-end;
+      }
+
+      .input-area {
+        display: flex;
+      }
+      #messageInput {
+        flex: 1;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #bbb;
+        outline: none;
+      }
+
+      button {
+        margin-left: 8px;
+        padding: 10px 14px;
+        border-radius: 6px;
+        border: none;
+        background: #4caf50;
+        color: white;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #43a047;
+      }
+
+      #emojiBtn {
+        margin-right: 8px;
+        padding: 0 10px;
+        border-radius: 6px;
+        border: none;
+        background: #ffd54f;
+        cursor: pointer;
+        font-size: 18px;
+      }
+
+      #emojiPicker {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 5px;
+        max-width: 350px;
+        max-height: 120px;
+        overflow-y: auto;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      #emojiPicker span {
+        cursor: pointer;
+        font-size: 20px;
+        margin: 3px;
+        display: inline-block;
+      }
+
+      /* status */
+      .status-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 4px;
+      }
+
+      .status-dot.online {
+        background: #4caf50; /* green */
+      }
+
+      .status-dot.offline {
+        background: #bbb; /* grey */
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="chat-container">
+      <h2>Room: {{ room_name }}</h2>
+
+      <p
+        style="
+          text-align: center;
+          color: #555;
+          margin-top: -5px;
+          font-size: 14px;
+        "
+      >
+        Online now: 
+        {% if online_users %} 
+        {{ online_users|join:", " }} 
+        {% else %} 
+        Nobody online 
+        {% endif %}
+      </p>
+
+      <div id="messages">
+        {% for m in messages %} {% if m.sender == request.user.username %}
+        <div class="msg-right">
+          <span
+            class="status-dot {% if m.sender in online_users %}online{% else %}offline{% endif %}"
+          ></span>
+          {{ m.sender }}: {{ m.message }}
+        </div>
+        {% else %}
+        <div class="msg-left">
+          <span
+            class="status-dot {% if m.sender in online_users %}online{% else %}offline{% endif %}"
+          ></span>
+          {{ m.sender }}: {{ m.message }}
+        </div>
+        {% endif %} {% endfor %}
+      </div>
+
+      <div class="input-area">
+        <button type="button" id="emojiBtn" onclick="toggleEmojiPicker()">
+          😊
+        </button>
+
+        <input
+          id="messageInput"
+          type="text"
+          placeholder="Type a message..."
+          oninput="sendTyping()"
+        />
+
+        <button onclick="sendMessage()">Send</button>
+      </div>
+
+      <!-- Emoji picker box -->
+      <div id="emojiPicker" style="display: none; margin-top: 5px"></div>
+
+      <div
+        id="typing"
+        style="color: #555; margin-bottom: 5px; height: 20px"
+      ></div>
+    </div>
+
+    <script>
+      const roomName = "{{ room_name|escapejs }}";
+      const username = "{{ request.user.username|escapejs }}";
+
+      const socket = new WebSocket(
+        "ws://" + window.location.host + "/ws/chat/" + roomName + "/"
+      );
+
+      let typingTimeout;
+
+      // Simple emoji list (you can add more later)
+      const EMOJIS = [
+        "😀",
+        "😁",
+        "😂",
+        "🤣",
+        "😊",
+        "😍",
+        "😘",
+        "😎",
+        "😢",
+        "😡",
+        "👍",
+        "👎",
+        "🙏",
+        "👏",
+        "💖",
+        "🔥",
+        "🎉",
+        "😴",
+        "🤔",
+        "😜",
+      ];
+
+      function buildEmojiPicker() {
+        const picker = document.getElementById("emojiPicker");
+        picker.innerHTML = ""; // clear
+
+        EMOJIS.forEach((e) => {
+          const span = document.createElement("span");
+          span.textContent = e;
+          span.onclick = () => addEmoji(e);
+          picker.appendChild(span);
+        });
+      }
+
+      function toggleEmojiPicker() {
+        const picker = document.getElementById("emojiPicker");
+        if (picker.style.display === "none") {
+          buildEmojiPicker();
+          picker.style.display = "block";
+        } else {
+          picker.style.display = "none";
+        }
+      }
+
+      function addEmoji(emoji) {
+        const input = document.getElementById("messageInput");
+        input.value += emoji;
+        input.focus();
+        sendTyping(); // show typing when emoji added
+      }
+
+      function sendTyping() {
+        socket.send(
+          JSON.stringify({
+            typing: true,
+            username: username,
+          })
+        );
+
+        clearTimeout(typingTimeout);
+
+        typingTimeout = setTimeout(() => {
+          socket.send(
+            JSON.stringify({
+              typing: false,
+              username: username,
+            })
+          );
+        }, 1000);
+      }
+
+      socket.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+
+        if ("typing" in data) {
+          const typingBox = document.getElementById("typing");
+
+          if (data.typing && data.username !== username) {
+            typingBox.textContent = data.username + " is typing...";
+          } else {
+            typingBox.textContent = "";
+          }
+          return;
+        }
+
+        // Normal messages
+        const box = document.getElementById("messages");
+        const div = document.createElement("div");
+
+        div.className = data.username === username ? "msg-right" : "msg-left";
+
+        div.textContent = data.username + ": " + data.message;
+
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+
+        document.getElementById("typing").textContent = "";
+      };
+
+      function sendMessage() {
+        const input = document.getElementById("messageInput");
+        const message = input.value.trim();
+        if (!message) return;
+
+        socket.send(
+          JSON.stringify({
+            message: message,
+            username: username,
+          })
+        );
+
+        input.value = "";
+      }
+    </script>
+  </body>
+</html>

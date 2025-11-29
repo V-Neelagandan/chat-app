@@ -1,5 +1,5 @@
 services:
-  # ---------------- BACKEND ----------------
+  # -------------- BACKEND --------------
   - type: web
     name: whatsapp-backend
     env: python
@@ -13,29 +13,31 @@ services:
         generateValue: true
       - key: DEBUG
         value: "False"
-      # ---- DB (fill these in Render dashboard or here) ----
+
+      # ---- DB (temporary / or real later) ----
       - key: DB_NAME
         value: whatsapp_db
       - key: DB_USER
         value: root
       - key: DB_PASSWORD
-        value: root
+        value: password
       - key: DB_HOST
         value: 127.0.0.1
       - key: DB_PORT
         value: "3306"
-      # Allow React app URL (update after first deploy frontend)
-      - key: FRONTEND_ORIGIN
-        value: "https://your-frontend.onrender.com"
 
-  # ---------------- FRONTEND ----------------
-  - type: static
+      # Allow React app URL (update AFTER frontend first deploy)
+      - key: FRONTEND_ORIGIN
+        value: "https://placeholder-frontend-url.com"
+
+  # -------------- FRONTEND --------------
+  - type: static_site        # ⬅️ THIS is the important fix
     name: whatsapp-frontend
     rootDir: frontend
     buildCommand: "npm install && npm run build"
     staticPublishPath: "dist"
     envVars:
       - key: VITE_API_BASE_URL
-        value: "https://whatsapp-backend.onrender.com"
+        value: "https://placeholder-backend-url.com"
       - key: VITE_WS_BASE_URL
-        value: "wss://whatsapp-backend.onrender.com"
+        value: "wss://placeholder-backend-url.com"

@@ -52,6 +52,9 @@ INSTALLED_APPS = [
     'corsheaders',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://chat-app-z1ko.onrender.com",
+]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",

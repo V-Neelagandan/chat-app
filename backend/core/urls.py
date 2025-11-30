@@ -17,7 +17,7 @@ from chat.views import (
     chat_room,
     api_rooms,
     api_messages,
-    # api_create_room,
+    api_create_room,
 )
 
 urlpatterns = [
@@ -32,7 +32,7 @@ urlpatterns = [
     path("chat/api/messages/<str:room_name>/", api_messages, name="api_messages"),
 
     # NEW: API to create a room
-    # path("chat/api/rooms/create/", api_create_room, name="api_create_room"), # <-- NEW PATH
+    path("chat/api/rooms/create/", api_create_room, name="api_create_room"), # <-- NEW PATH
     
     # Auth (HTML + API)
     path("accounts/", include("accounts.urls")),

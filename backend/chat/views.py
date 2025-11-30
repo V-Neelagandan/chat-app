@@ -10,13 +10,39 @@ from .models import ChatMessage, ChatRoom, RoomStatus
 
 # for API
 from django.http import JsonResponse
-# import json
+import json
 from django.views.decorators.http import require_GET
-# from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt
 # import re
 
 
 # Create your views here.
+@csrf_exempt
+def api_create_room(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
+
+    try:
+        # Try JSON first, fall back to form-encoded
+        if request.headers.get("Content-Type", "").startswith("application/json"):
+            body = request.body.decode("utf-8") or "{}"
+            data = json.loads(body)
+        else:
+            data = request.POST
+
+        room_name = data.get("room_name")
+        if not room_name:
+            return JsonResponse({"error": "Room name required"}, status=400)
+
+        room, created = ChatRoom.objects.get_or_create(room_name=room_name)
+
+        if not created:
+            return JsonResponse({"error": "Room already exists"}, status=409)
+
+        return JsonResponse({"success": True, "room_name": room_name})
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
+
 
 @login_required
 def room_list(request):
